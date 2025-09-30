@@ -23,7 +23,7 @@ STOPS_BY_LINE_URL = f"{STOPS_URL}/BuscarParadasPorLinha"
 
 def get_stops_by_line(credentials: RequestsCookieJar, line_id: int) -> list[Stop]:
     """
-    Get all the stops for the given line.
+    Get all the stops of the given line.
 
     Parameters:
     - `credentials`: Saved cookies from a previous login call.
