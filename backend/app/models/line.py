@@ -15,5 +15,5 @@ class Line(Base):
     __tablename__ = "line"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    direction = Column(EnumDB(LineDirection))
+    name = Column(String, index=True, nullable=False)
+    direction = Column(EnumDB(LineDirection), nullable=False)
