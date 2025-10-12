@@ -5,13 +5,15 @@ from app.schemas import Line
 from sqlalchemy import select, update
 from tqdm import tqdm as progress_bar
 
+FILE_LOCATION = "app/commands/sptrans_static_data/fare_rules.txt"
+
 
 def create_lines() -> None:
     """
     Create lines from the static SPTrans data.
     """
     user = sptrans_client.login()
-    with open("app/commands/sptrans_static_data/fare_rules.txt", "r") as file:
+    with open(FILE_LOCATION, "r") as file:
         file_lines = file.readlines()
 
     line_data: dict[int, Line] = {}
