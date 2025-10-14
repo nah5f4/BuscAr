@@ -1,9 +1,8 @@
-from app.core.config import settings
-from app.schemas import Stop
 import requests
-from requests.cookies import RequestsCookieJar
+from app.core.config import settings
+from app.schemas import Line, Stop
 from pydantic import TypeAdapter
-
+from requests.cookies import RequestsCookieJar
 
 LOGIN_URL = f"{settings.PREFIX_URL}/Login/Autenticar"
 
@@ -15,6 +14,26 @@ def login() -> RequestsCookieJar:
     response = requests.post(LOGIN_URL, params={"token": settings.API_TOKEN})
     response.raise_for_status()
     return response.cookies
+
+
+LINES_URL = f"{settings.PREFIX_URL}/Linha"
+LINES_LOOK_UP_URL = f"{LINES_URL}/Buscar"
+
+
+def get_lines(credentials: RequestsCookieJar, pattern: str) -> list[Line]:
+    """
+    Get all the lines that contains the given `pattern`.
+
+    Parameters:
+    - `pattern`: The pattern to look up.
+    """
+    response = requests.get(
+        LINES_LOOK_UP_URL,
+        params={"termosBusca": pattern},
+        cookies=credentials,
+    )
+    response.raise_for_status()
+    return TypeAdapter(list[Line]).validate_python(response.json())
 
 
 STOPS_URL = f"{settings.PREFIX_URL}/Parada"
