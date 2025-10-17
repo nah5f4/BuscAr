@@ -1,5 +1,5 @@
 from app.core.database import Base, engine
-from app.models import line, rota  # noqa: F401
+from app.models import line, rota, stop  # noqa: F401
 from fastapi import FastAPI
 
 app = FastAPI()
