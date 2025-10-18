@@ -1,5 +1,5 @@
 from app.core.database import SessionLocal
-from app.models import LineModel, StopModel
+from app.models import LineModel, LineStopModel, StopModel
 from app.repositories import sptrans_client
 from app.schemas import Stop
 from sqlalchemy import select, update
@@ -63,6 +63,24 @@ def create_lines() -> None:
     if len(stops_to_update) > 0:
         session.execute(update(StopModel), stops_to_update)
         session.commit()
+
+    existing_line_stop_ids = set(
+        session.execute(select(LineStopModel.line_id, LineStopModel.stop_id)).all()
+    )
+
+    line_stops: list[LineStopModel] = []
+    for line_id, stops in stops_by_line.items():
+        line_stops.extend(
+            [
+                LineStopModel(line_id=line_id, stop_id=stop.id)
+                for stop in stops
+                if (line_id, stop.id) not in existing_line_stop_ids
+            ]
+        )
+
+    print(f"Criando {len(line_stops)} paradas-linhas na base de dados...")
+    session.add_all(line_stops)
+    session.commit()
 
 
 if __name__ == "__main__":
