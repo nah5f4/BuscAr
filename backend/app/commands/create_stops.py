@@ -31,34 +31,27 @@ def create_lines() -> None:
 
     existing_stop_ids = session.execute(select(StopModel.id)).scalars().all()
 
-    stops_to_create = [
-        StopModel(
+    stops_to_create: list[StopModel] = []
+    stops_to_update: list[dict] = []
+    for stop in stops:
+        stop_model = StopModel(
             id=stop.id,
-            name=stop.name,
+            name=stop.name if stop.name else stop.address,
             address=stop.address,
             latitude=stop.latitude,
             longitude=stop.longitude,
         )
-        for stop in stops
-        if stop.id not in existing_stop_ids
-    ]
+        if stop.id in existing_stop_ids:
+            stops_to_update.append(stop_model.__dict__)
+        else:
+            stops_to_create.append(stop_model)
+
     print(f"Criando {len(stops_to_create)} paradas na base de dados...")
 
     if len(stops_to_create) > 0:
         session.add_all(stops_to_create)
         session.commit()
 
-    stops_to_update = [
-        StopModel(
-            id=stop.id,
-            name=stop.name,
-            address=stop.address,
-            latitude=stop.latitude,
-            longitude=stop.longitude,
-        ).__dict__
-        for stop in stops
-        if stop.id in existing_stop_ids
-    ]
     print(f"Atualizando {len(stops_to_update)} paradas na base de dados...")
     if len(stops_to_update) > 0:
         session.execute(update(StopModel), stops_to_update)
